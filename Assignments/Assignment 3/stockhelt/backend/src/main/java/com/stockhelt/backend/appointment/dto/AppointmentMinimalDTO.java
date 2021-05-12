@@ -1,6 +1,8 @@
 package com.stockhelt.backend.appointment.dto;
 
 
+import com.stockhelt.backend.patient.dto.PatientMinimalDTO;
+import com.stockhelt.backend.user.dto.DoctorDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +16,8 @@ import java.util.Date;
 @NoArgsConstructor
 public class AppointmentMinimalDTO {
     private Long id;
-    private String doctorName;
-    private String patientName;
+    private DoctorDTO doctor;
+    private PatientMinimalDTO patient;
     private Date date;
+    private int duration;
 }

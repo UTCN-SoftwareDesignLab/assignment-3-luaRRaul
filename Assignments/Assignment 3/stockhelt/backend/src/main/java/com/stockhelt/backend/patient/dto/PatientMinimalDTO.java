@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 @Data
 @Builder
@@ -15,5 +14,4 @@ public class PatientMinimalDTO {
     private Long id;
     private String firstName;
     private String lastName;
-    private String CNP;
 }

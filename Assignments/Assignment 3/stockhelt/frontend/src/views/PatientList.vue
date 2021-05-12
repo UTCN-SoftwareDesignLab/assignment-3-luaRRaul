@@ -42,7 +42,6 @@ export default {
       headers: [
         { text: "First Name", value: "firstName" },
         { text: "Last Name", value: "lastName" },
-        { text: "CNP", value: "cnp" },
       ],
       dialogVisible: false,
       selectedPatient: {},

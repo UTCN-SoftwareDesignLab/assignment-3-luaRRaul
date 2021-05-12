@@ -3,7 +3,8 @@ package com.stockhelt.backend.appointment.mapper;
 import com.stockhelt.backend.appointment.dto.AppointmentDTO;
 import com.stockhelt.backend.appointment.dto.AppointmentMinimalDTO;
 import com.stockhelt.backend.appointment.model.Appointment;
-import com.stockhelt.backend.user.UserService;
+import com.stockhelt.backend.patient.dto.PatientMinimalDTO;
+import com.stockhelt.backend.user.dto.DoctorDTO;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
@@ -19,15 +20,33 @@ public interface AppointmentMapper {
     Appointment fromMinimalDto(AppointmentMinimalDTO appointmentMinimalDTO);
 
     @AfterMapping
-    default void populateNamesMinimal(Appointment appointment, @MappingTarget AppointmentMinimalDTO appointmentMinimalDTO){
-        appointmentMinimalDTO.setDoctorName(appointment.getDoctor().getUsername());
-        appointmentMinimalDTO.setPatientName(appointment.getPatient().getFirstName()+" "+appointment.getPatient().getLastName());
+    default void populateMinimal(Appointment appointment, @MappingTarget AppointmentMinimalDTO appointmentMinimalDTO){
+        appointmentMinimalDTO.setDoctor(DoctorDTO.builder()
+                .id(appointment.getDoctor().getId())
+                .username(appointment.getDoctor().getUsername())
+                .build()
+        );
+        appointmentMinimalDTO.setPatient(PatientMinimalDTO.builder()
+                .id(appointment.getPatient().getId())
+                .lastName(appointment.getPatient().getLastName())
+                .firstName(appointment.getPatient().getFirstName())
+                .build()
+        );
     }
 
 
     @AfterMapping
-    default void populateName(Appointment appointment, @MappingTarget AppointmentDTO appointmentDTO){
-        appointmentDTO.setDoctorName(appointment.getDoctor().getUsername());
-        appointmentDTO.setPatientName(appointment.getPatient().getFirstName()+" "+appointment.getPatient().getLastName());
+    default void populate(Appointment appointment, @MappingTarget AppointmentDTO appointmentDTO){
+        appointmentDTO.setDoctor(DoctorDTO.builder()
+                .id(appointment.getDoctor().getId())
+                .username(appointment.getDoctor().getUsername())
+                .build()
+        );
+        appointmentDTO.setPatient(PatientMinimalDTO.builder()
+                .id(appointment.getPatient().getId())
+                .lastName(appointment.getPatient().getLastName())
+                .firstName(appointment.getPatient().getFirstName())
+                .build()
+        );
     }
 }

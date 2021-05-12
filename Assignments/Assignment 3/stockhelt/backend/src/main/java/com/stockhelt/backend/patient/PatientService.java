@@ -42,7 +42,7 @@ public class PatientService {
         actPatient.setAddress(patient.getCNP());
         actPatient.setAddress(patient.getAddress());
 
-        return patientMapper.toDto(actPatient);
+        return patientMapper.toDto(patientRepository.save(actPatient));
     }
 
     private Patient findById(Long id) {

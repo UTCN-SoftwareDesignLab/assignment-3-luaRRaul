@@ -12,4 +12,5 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class DoctorDTO {
     public long id;
+    public String username;
 }

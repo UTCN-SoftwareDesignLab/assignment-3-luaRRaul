@@ -37,7 +37,8 @@ export default {
       appointments: [],
       search: "",
       headers: [
-        { text: "Patient's name", value: "patientName" },
+        { text: "Patient's First Name", value: "patient.firstName" },
+        { text: "Patient's Last Name", value: "patient.lastName" },
         { text: "Date", value: "date" },
       ],
       dialogVisible: false,

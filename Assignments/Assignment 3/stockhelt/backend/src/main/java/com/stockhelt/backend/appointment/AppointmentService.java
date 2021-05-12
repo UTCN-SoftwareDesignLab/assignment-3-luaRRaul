@@ -8,8 +8,10 @@ import com.stockhelt.backend.patient.PatientRepository;
 import com.stockhelt.backend.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import javax.persistence.EntityNotFoundException;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -17,28 +19,34 @@ import static java.util.stream.Collectors.toList;
 @Service
 @RequiredArgsConstructor
 public class AppointmentService {
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private final AppointmentRepository appointmentRepository;
     private final AppointmentMapper appointmentMapper;
     private final UserRepository userRepository;
     private final PatientRepository patientRepository;
 
     public AppointmentDTO create (AppointmentDTO appointmentDTO){
-        Appointment actAppointment = appointmentMapper.fromDto(appointmentDTO);
-        actAppointment.setDoctor(userRepository.findDoctorByUsername(appointmentDTO.getDoctorName()));
-        String[] patientNameSplit = appointmentDTO.getPatientName().split("\\s+");
-        actAppointment.setPatient(patientRepository.findByFirstNameAndLastName(patientNameSplit[0], patientNameSplit[1]));
+        if(checkDoctorAvailability(appointmentDTO)){
+            Appointment actAppointment = appointmentMapper.fromDto(appointmentDTO);
+            actAppointment.setDoctor(userRepository.findDoctorById(appointmentDTO.getDoctor().getId()));
+            actAppointment.setPatient(patientRepository.findById(appointmentDTO.getPatient().getId()).get());
 
-        Appointment actRetAppointment = appointmentRepository.save(actAppointment);
+            Appointment actRetAppointment = appointmentRepository.save(actAppointment);
 
-        System.out.println(actRetAppointment);
+            System.out.println(actRetAppointment);
 
-        AppointmentDTO retAppointment = appointmentMapper.toDto(actRetAppointment);
-        retAppointment.setDoctorName(actRetAppointment.getDoctor().getUsername());
-        retAppointment.setPatientName(actRetAppointment.getPatient().getFirstName()+actRetAppointment.getPatient().getLastName());
+            AppointmentDTO retAppointment = appointmentMapper.toDto(actRetAppointment);
 
-        System.out.println(retAppointment);
+            System.out.println(retAppointment);
 
-        return retAppointment;
+            return retAppointment;
+
+        }else{
+            //some message
+            System.out.println("Dates not valid");
+        }
+
+        return null;
     }
 
     public AppointmentDTO get (Long id)
@@ -57,18 +65,45 @@ public class AppointmentService {
     }
 
     public AppointmentDTO edit(Long id, AppointmentDTO appointment) {
-        Appointment actAppointment = findById(id);
-        String[] patientNameSplit = appointment.getPatientName().split("\\s+");
+        if(checkDoctorAvailability(appointment)) {
+            Appointment actAppointment = findById(id);
 
-        actAppointment.setPatient(patientRepository.findByFirstNameAndLastName(patientNameSplit[0], patientNameSplit[1]));
-        actAppointment.setDoctor(userRepository.findDoctorByUsername(appointment.getDoctorName()));
-        actAppointment.setDate(appointment.getDate());
-        actAppointment.setDescription(appointment.getDescription());
+            actAppointment.setPatient(patientRepository.findById(appointment.getPatient().getId()).get());
+            actAppointment.setDoctor(userRepository.findDoctorById(appointment.getDoctor().getId()));
+            actAppointment.setDate(appointment.getDate());
+            actAppointment.setDescription(appointment.getDescription());
+            actAppointment.setDuration(appointment.getDuration());
 
-        return appointmentMapper.toDto(actAppointment);
+            return appointmentMapper.toDto(appointmentRepository.save(actAppointment));
+        }else{
+            //not valid duration
+            System.out.println("Doctor is not available in the new time interval.");
+        }
+
+        return null;
     }
 
     private Appointment findById(Long id) {
         return appointmentRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Appointment not found: "+id));
+    }
+
+    private boolean checkDoctorAvailability(AppointmentDTO appointmentDTO){
+        for(Appointment a : appointmentRepository.findAllByDoctorId(appointmentDTO.getDoctor().getId())){
+            if(!a.getId().equals(appointmentDTO.getId())) {
+                Calendar aTime = Calendar.getInstance();
+                aTime.setTime(a.getDate());
+                Calendar dtoTime = Calendar.getInstance();
+                dtoTime.setTime(a.getDate());
+                if ((appointmentDTO.getDate().compareTo(a.getDate()) == 0) && (aTime.getTimeInMillis() >= dtoTime.getTimeInMillis()) && (aTime.getTimeInMillis() <= dtoTime.getTimeInMillis() + appointmentDTO.getDuration() * 60000L)) {
+                    return false;
+                } else {
+                    if ((appointmentDTO.getDate().compareTo(a.getDate()) == 0) && (aTime.getTimeInMillis() + a.getDuration() * 60000L >= dtoTime.getTimeInMillis())) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 }

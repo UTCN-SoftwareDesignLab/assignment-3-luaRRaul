@@ -9,7 +9,9 @@
         <v-toolbar color="primary" dark>
         </v-toolbar>
         <v-form>
-          <v-text-field v-model="appointment.patientName" label="Patient Name" />
+          <v-text-field v-model="appointment.patient.firstName" label="Patient's First Name" />
+          <v-text-field v-model="appointment.patient.lastName" label="Patient's Last Name" />
+          <v-text-field v-model="appointment.description" label="Description" />
           <v-text-field v-model="appointment.date" label="Date" />
         </v-form>
       </v-card>
@@ -38,11 +40,23 @@ export default {
         api.appointments
             .edit({
               id: this.appointment.id,
-              patientName: this.appointment.patientName,
+              firstName: this.appointment.patient.firstName,
+              lastName: this.appointment.patient.lastName,
+              description: this.appointment.description,
               date: this.appointment.date,
             })
             .then(() => this.$emit("refresh"));
     },
+  },
+  watch:{
+    opened: async function (newVal, oldVal) {
+      if (newVal && !oldVal) {
+        this.appointment = await api.appointments.getFullAppointment({
+          id: this.appointment.id
+        });
+        this.connect();
+      }
+    }
   },
 };
 </script>
