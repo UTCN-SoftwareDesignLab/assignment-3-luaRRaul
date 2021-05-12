@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
-import static com.stockhelt.backend.UrlMapping.APPOINTMENTS;
-import static com.stockhelt.backend.UrlMapping.ENTITY;
+import static com.stockhelt.backend.UrlMapping.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -26,6 +26,11 @@ public class AppointmentController {
     public AppointmentDTO getAppointment(@PathVariable Long id)
     {
         return appointmentService.get(id);
+    }
+
+    @GetMapping("/patient"+ENTITY)
+    public List<AppointmentDTO> getAppointmentsForPatient(@PathVariable Long id){
+        return appointmentService.getAppointmentsForPatient(id);
     }
 
     @PutMapping(ENTITY)

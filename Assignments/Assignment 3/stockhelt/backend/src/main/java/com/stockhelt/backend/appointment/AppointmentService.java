@@ -13,6 +13,8 @@ import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -105,5 +107,9 @@ public class AppointmentService {
         }
 
         return true;
+    }
+
+    public List<AppointmentDTO> getAppointmentsForPatient(Long id) {
+        return appointmentRepository.findAllByPatientId(id).stream().map(appointmentMapper::toDto).filter(a -> a.getDate().before(new java.util.Date())).collect(Collectors.toList());
     }
 }

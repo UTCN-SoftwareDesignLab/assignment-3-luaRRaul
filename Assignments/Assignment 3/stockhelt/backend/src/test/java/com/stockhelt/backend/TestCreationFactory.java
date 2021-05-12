@@ -2,6 +2,7 @@ package com.stockhelt.backend;
 
 import com.stockhelt.backend.appointment.dto.AppointmentMinimalDTO;
 import com.stockhelt.backend.patient.dto.PatientMinimalDTO;
+import com.stockhelt.backend.user.dto.DoctorDTO;
 import com.stockhelt.backend.user.dto.UserDTO;
 
 import java.util.Date;
@@ -46,8 +47,8 @@ public class TestCreationFactory {
     private static AppointmentMinimalDTO newAppointmentMinimalDTO() {
         return AppointmentMinimalDTO.builder()
                 .id(randomLong())
-                .doctorName(randomString())
-                .patientName(randomEmail())
+                .doctor(DoctorDTO.builder().id(2L).build())
+                .patient(PatientMinimalDTO.builder().id(1L).build())
                 .date(randomDate())
                 .build();
     }
@@ -61,7 +62,6 @@ public class TestCreationFactory {
                 .id(randomLong())
                 .firstName(randomString())
                 .lastName(randomString())
-                .CNP(randomString())
                 .build();
     }
 
